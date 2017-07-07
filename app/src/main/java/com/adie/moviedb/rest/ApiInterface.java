@@ -6,6 +6,7 @@ import com.adie.moviedb.model.DetailMovie;
 import com.adie.moviedb.model.DetailTV;
 import com.adie.moviedb.model.InTheaterResponse;
 import com.adie.moviedb.model.MovieResponse;
+import com.adie.moviedb.model.SearchResponse;
 import com.adie.moviedb.model.TVResponse;
 import com.adie.moviedb.model.VideoResponse;
 
@@ -46,4 +47,8 @@ public interface ApiInterface {
 
     @GET("tv/{id}/credits")
     Call<CreditsResponse> getTVCredits(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("search/movie")
+    Call<SearchResponse> getSearch(@Query("api_key") String apiKey,@Query("query") String query);
+
 }

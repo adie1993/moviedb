@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_above="@+id/navigation"
+    android:layout_below="@+id/toolbar"
     android:orientation="vertical"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
     tools:showIn="@layout/activity_main"
     tools:context="com.adie.moviedb.activity.MainActivity">
 

@@ -12,9 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.adie.moviedb.R;
-import com.adie.moviedb.activity.DetailTVActivity;
-import com.adie.moviedb.model.Cast;
-import com.adie.moviedb.model.TV;
+import com.adie.moviedb.activity.DetailMovieActivity;
+import com.adie.moviedb.model.Movie;
+import com.adie.moviedb.model.SearchResult;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
@@ -24,24 +24,24 @@ import static com.adie.moviedb.rest.ApiClient.API_KEY;
 import static com.adie.moviedb.rest.ApiClient.BASE_IMAGE;
 
 
-public class CastAdapter extends RecyclerView.Adapter<CastAdapter.MyViewHolder> {
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.MyViewHolder> {
 
-    private List<Cast> images;
+    private List<SearchResult> images;
     private Context mContext;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public ImageView thumbnail;
-        public TextView name,origin_name;
+        public TextView title,year;
         public MyViewHolder(View view) {
             super(view);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-            name = (TextView)view.findViewById(R.id.name);
-            origin_name = (TextView)view.findViewById(R.id.original_name);
+            title = (TextView)view.findViewById(R.id.title);
+            year = (TextView)view.findViewById(R.id.year);
         }
     }
 
 
-    public CastAdapter(Context context, List<Cast> images) {
+    public SearchAdapter(Context context, List<SearchResult> images) {
         mContext = context;
         this.images = images;
     }
@@ -49,30 +49,41 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.MyViewHolder> 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.cast_thumbnail, parent, false);
+                .inflate(R.layout.gallery_thumbnail, parent, false);
 
         return new MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
-        final Cast image = images.get(position);
+    public void onBindViewHolder(MyViewHolder holder, int position) {
+        final SearchResult image = images.get(position);
 
-
-        Glide.with(mContext).load(BASE_IMAGE+image.getProfilePath()+"?api_key="+API_KEY)
+        Glide.with(mContext).load(BASE_IMAGE+image.getPosterPath()+"?api_key="+API_KEY)
                 .thumbnail(0.5f)
                 .crossFade()
-
+                .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.thumbnail);
-        holder.name.setText(image.getCharacter());
-        holder.origin_name.setText(image.getName());
+        holder.title.setText(image.getTitle());
+        if(image.getReleaseDate()==""){
 
+        }else if(image.getReleaseDate()!=""){
+            holder.year.setText(image.getReleaseDate().substring(0,4));
+        }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(view.getContext(), DetailMovieActivity.class);
+                i.putExtra("id",image.getId());
+                view.getContext().startActivity(i);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return (images.size());
+        return images.size();
     }
 
     public interface ClickListener {
@@ -84,9 +95,9 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.MyViewHolder> 
     public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
         private GestureDetector gestureDetector;
-        private CastAdapter.ClickListener clickListener;
+        private SearchAdapter.ClickListener clickListener;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final CastAdapter.ClickListener clickListener) {
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final SearchAdapter.ClickListener clickListener) {
             this.clickListener = clickListener;
             gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override

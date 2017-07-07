@@ -52,7 +52,7 @@ public class DetailMovieActivity extends AppCompatActivity {
     private Menu collapsedMenu;
     private boolean appBarExpanded = true;
     int id;
-    String key_trailer;
+    String key_trailer="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,15 +112,10 @@ public class DetailMovieActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //get youtube key from getvid() method
+
                 if(!key_trailer.isEmpty()){
                     Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key_trailer));
                     startActivity(appIntent);
-                }else{
-                    Snackbar snackbar = Snackbar
-                            .make(appBarLayout, "No Video Trailer", Snackbar.LENGTH_LONG);
-                    View snackBarView = snackbar.getView();
-                    snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),R.color.red));
-                    snackbar.show();
                 }
 
             }
@@ -159,8 +154,13 @@ public class DetailMovieActivity extends AppCompatActivity {
                 //if response is success do fetch value response to target view
                 int statusCode = response.code();
                 DetailMovie movies = response.body();
-                String year = movies.getReleaseDate().substring(0,4);
-                collapsingToolbar.setTitle(movies.getTitle()+" ("+year+")");
+                if(movies.getReleaseDate()!=""){
+                    String year = movies.getReleaseDate().substring(0,4);
+                    collapsingToolbar.setTitle(movies.getTitle()+" ("+year+")");
+                }else if(movies.getReleaseDate()==""){
+                    collapsingToolbar.setTitle(movies.getTitle());
+                }
+
 
                 Glide.with(getApplicationContext()).load(BASE_IMAGE_DET+movies.getBackdropPath()+"?api_key="+API_KEY)
                         .thumbnail(0.5f)
@@ -215,9 +215,16 @@ public class DetailMovieActivity extends AppCompatActivity {
                 //get response value fetch to interface class
                 List<Video> vid = response.body().getResults();
                 for(int i = 0;i<vid.size();i++){
-                    key_trailer = vid.get(i).getKey();
-                }
 
+                        key_trailer = vid.get(i).getKey();
+
+                }
+                //set visibility fab
+                if(key_trailer.isEmpty()){
+                    fab.setVisibility(View.GONE);
+                }else{
+                    fab.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
